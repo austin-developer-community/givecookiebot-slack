@@ -43,4 +43,4 @@ used to access the Slack API.
 License
 -------
 
-`MIT License <LICENSE>`_ © Austin Developer Community
+`GPLv3 License <LICENSE>`_ © Austin Developer Community
