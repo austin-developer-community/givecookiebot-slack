@@ -31,7 +31,7 @@ Slack API Tokens
 First, the Slack client tokens must be added to the environment variables in
 ``~/.bashrc``:
 
-.. code-block:: bashrc
+.. code-block:: bash
 
   export SLACK_CLIENT_ID="first_long_complicated_string_here"
   export SLACK_CLIENT_SECRET="second_long_complicated_string_here"
