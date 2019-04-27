@@ -70,6 +70,15 @@ html_static_path = ['_static']
 
 # -- Options for LaTeX output ------------------------------------------------
 
+latex_engine = 'xelatex'
+latex_elements = {
+    'fontpkg': r'''
+\setmainfont{DejaVu Serif}
+\setsansfont{DejaVu Sans}
+\setmonofont{Symbola}
+''',
+}
+
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
