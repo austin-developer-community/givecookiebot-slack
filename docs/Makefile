@@ -23,6 +23,7 @@ help:
 # Define PDF target using LaTeX PDF
 latexpdf:
 	$(SPHINXBUILD) -b latex ./source/ $(PDFBUILDDIR)/latex
+	touch $(PDFBUILDDIR)/latex/givecookiebot-slack.ind
 	@echo "Running LaTeX files through pdflatex..."
 	make -C $(PDFBUILDDIR)/latex all-pdf
 	cp $(PDFBUILDDIR)/latex/*.pdf $(PDF)
