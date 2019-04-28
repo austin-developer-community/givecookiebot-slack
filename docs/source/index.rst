@@ -9,10 +9,15 @@
 
 .. toctree::
    :maxdepth: 2
-   :caption: API Reference:
+   :caption: API Reference
 
    modules
 
+.. toctree::
+  :maxdepth: 2
+  :caption: About
+
+  about/CONTRIBUTING
 
 Indices and tables
 ==================
