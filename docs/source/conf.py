@@ -12,6 +12,7 @@
 #
 import os
 import sys
+from recommonmark.transform import AutoStructify
 sys.path.insert(0, os.path.abspath('../..'))
 
 
@@ -38,6 +39,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon',
     'sphinx.ext.intersphinx',
+    'recommonmark',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -69,6 +71,7 @@ html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
 # -- Options for LaTeX output ------------------------------------------------
+# FIXME: PDF sections are not nesting properly. recommonmark issue?
 
 latex_engine = 'xelatex'
 latex_elements = {
@@ -86,3 +89,12 @@ latex_documents = [
     (master_doc, 'givecookiebot-slack.tex', 'givecookiebot-slack Documentation',
      'Austin Developer Community', 'manual'),
 ]
+
+# -- Extension configuration -------------------------------------------------
+
+def setup(app):
+    app.add_config_value('recommonmark_config', {
+            'auto_toc_tree_section': 'Contents',
+            'enable_eval_rst': True,
+            }, True)
+    app.add_transform(AutoStructify)
