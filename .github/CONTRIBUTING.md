@@ -3,12 +3,14 @@
 Thanks for helping out! There are plenty of typos to fix and features to add.
 Getting started is easy!
 
-# Installation
+## Installation
 
-General installation is covered in the [README](../README.rst). Installing into
+General installation is covered in the [README][readme]. Installing into
 a [venv](https://docs.python.org/3/library/venv.html) is recommended.
 
-# Development
+[readme]: https://github.com/austin-developer-community/givecookiebot-slack/blob/master/README.rst
+
+## Development
 
 Install additional requirements from `requirements-dev.txt`:
 
@@ -18,11 +20,11 @@ pip install -r requirements-dev.txt
 
 Ensure any additional contributions follow `pylint` guidelines.
 
-# Building Documentation
+## Building Documentation
 
 Building documentation is not needed unless contributing to the documentation.
 
-## HTML Docs
+### HTML Docs
 
 Install requirements specified in `requirements-docs.txt`. Move to `docs`
 directory and build the HTML files:
@@ -33,7 +35,7 @@ $ make html
 
 HTML files will be located in `../../givecookiebot-slack-docs/html/`.
 
-## LaTeX PDF
+### LaTeX PDF
 
 Building the PDF has more requirements that vary based on the operating system.
 For Ubuntu 18.04:
@@ -49,36 +51,36 @@ PDF. Build the PDF from within the `docs` directory:
 $ make latexpdf
 ```
 
-The PDF is saved to `../givecookiebot-slack.pdf`.
+The PDF is saved to `../givecookiebot-slack.pdf`. It may have to be built
+multiple times to build without errors because the indexer sometimes fails.
 
-# Code of Conduct
+## Code of Conduct
 
-Whether submitting [Issues][#Submit Bug/Issue/Enhancement] or
-[Pull Requests][#Submit Pull Request], be sure to follow the
+Whether submitting Issues or Pull Requests, be sure to follow the
 [Code of Conduct][conduct].
 
-[conduct]: ../CODE_OF_CONDUCT.md
+[conduct]: https://github.com/austin-developer-community/givecookiebot-slack/blob/master/CODE_OF_CONDUCT.md
 
-# Submit Bug/Issue/Enhancement
+## Submit Bug/Issue/Enhancement
 
 Open an issue in the [GitHub Issue tracker][tracker] following the
 [Issue template][issuetemplate]. Be as detailed as you can to help identify the
 bug.
 
 [tracker]: https://github.com/austin-developer-community/givecookiebot-slack/issues
-[issuetemplate]: ./ISSUE_TEMPLATE.md
+[issuetemplate]: https://github.com/austin-developer-community/givecookiebot-slack/blob/master/.github/ISSUE_TEMPLATE.md
 
-# Submit Pull Request
+## Submit Pull Request
 
 Whether adding a feature or fixing a bug, open a pull request in
-[GitHub][pulls] following the [Pull request template][prtempalte].
+[GitHub][pulls] following the [Pull request template][prtemplate].
 
 [pulls]: https://github.com/austin-developer-community/givecookiebot-slack/pulls
-[prtemplate]: ./PULL_REQUEST_TEMPLATE.md
+[prtemplate]: https://github.com/austin-developer-community/givecookiebot-slack/blob/master/.github/PULL_REQUEST_TEMPLATE.md
 
-# Contact
+## Contact
 
-Our [Facebook group][contact] has a link to the Slack workspace where 
+Our [Facebook group][contact] has a link to the Slack workspace where
 questions can be asked in the `#general` channel or concerns can be raised by
 Direct Messaging the project team.
 
