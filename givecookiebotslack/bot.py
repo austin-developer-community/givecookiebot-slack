@@ -2,6 +2,12 @@
 
 Defines `Event API`_ events that the bot will respond to.
 
+Attributes:
+    SLACK_SIGNING_SECRET (str): Secret identifying bot to Slack Events API. Like a password.
+    SLACK_BOT_TOKEN (str): Token used to access Slack Web API.
+    slack_events_adapter (SlackEventAdapter): Instance of :py:class:`SlackEventAdapter`.
+    slack_client (SlackClient): Instance of :py:class:`SlackClient`.
+
 .. _Event API: https://api.slack.com/events-api
 """
 
