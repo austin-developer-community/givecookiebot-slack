@@ -15,6 +15,8 @@ import sys
 from recommonmark.transform import AutoStructify
 sys.path.insert(0, os.path.abspath('../..'))
 
+from givecookiebotslack import __version__
+
 
 # -- Project information -----------------------------------------------------
 
@@ -23,10 +25,10 @@ copyright = '2019, Austin Developer Community'
 author = 'Austin Developer Community'
 
 # The short X.Y version
-version = '0.2'
+version = '.'.join(__version__.split('.', 2)[:2])
 
 # The full version, including alpha/beta/rc tags
-release = '0.2.0'
+release = __version__
 
 
 # -- General configuration ---------------------------------------------------
