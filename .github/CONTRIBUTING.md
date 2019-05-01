@@ -8,7 +8,7 @@ Getting started is easy!
 General installation is covered in the [README][readme]. Installing into
 a [venv](https://docs.python.org/3/library/venv.html) is recommended.
 
-[readme]: https://github.com/austin-developer-community/givecookiebot-slack/blob/master/README.rst
+[readme]: https://github.com/austin-developer-community/givecookiebot-slack/tree/master/README.rst
 
 ## Development
 
@@ -59,7 +59,7 @@ multiple times to build without errors because the indexer sometimes fails.
 Whether submitting Issues or Pull Requests, be sure to follow the
 [Code of Conduct][conduct].
 
-[conduct]: https://github.com/austin-developer-community/givecookiebot-slack/blob/master/CODE_OF_CONDUCT.md
+[conduct]: https://github.com/austin-developer-community/givecookiebot-slack/tree/master/CODE_OF_CONDUCT.md
 
 ## Submit Bug/Issue/Enhancement
 
@@ -68,7 +68,7 @@ Open an issue in the [GitHub Issue tracker][tracker] following the
 bug.
 
 [tracker]: https://github.com/austin-developer-community/givecookiebot-slack/issues
-[issuetemplate]: https://github.com/austin-developer-community/givecookiebot-slack/blob/master/.github/ISSUE_TEMPLATE.md
+[issuetemplate]: https://github.com/austin-developer-community/givecookiebot-slack/tree/master/.github/ISSUE_TEMPLATE.md
 
 ## Submit Pull Request
 
@@ -76,7 +76,7 @@ Whether adding a feature or fixing a bug, open a pull request in
 [GitHub][pulls] following the [Pull request template][prtemplate].
 
 [pulls]: https://github.com/austin-developer-community/givecookiebot-slack/pulls
-[prtemplate]: https://github.com/austin-developer-community/givecookiebot-slack/blob/master/.github/PULL_REQUEST_TEMPLATE.md
+[prtemplate]: https://github.com/austin-developer-community/givecookiebot-slack/tree/master/.github/PULL_REQUEST_TEMPLATE.md
 
 ## Contact
 
