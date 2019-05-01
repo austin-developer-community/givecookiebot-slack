@@ -8,6 +8,7 @@ SOURCEDIR     = source
 BUILDDIR      = ../../givecookiebot-slack-docs
 PDFBUILDDIR   = /tmp
 PDF           = ../givecookiebot-slack.pdf
+LINKCHECKDIR  = build/linkcheck
 
 # Put it first so that "make" without argument is like "make help".
 help:
@@ -28,3 +29,11 @@ latexpdf:
 	make -C $(PDFBUILDDIR)/latex all-pdf
 	cp $(PDFBUILDDIR)/latex/*.pdf $(PDF)
 	@echo "pdflatex finished; see $(PDF)"
+
+# Define link checker for external links.
+checklinks:
+	$(SPHINXBUILD) -b linkcheck $(SOURCEDIR) $(LINKCHECKDIR)
+	@echo
+	@echo "Check finished. Report is in $(LINKCHECKDIR)."
+
+.PHONY: make checklinks
