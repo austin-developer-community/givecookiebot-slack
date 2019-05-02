@@ -76,6 +76,35 @@ Use either the ``http`` or ``https`` forwarding address:
 
 .. _ngrok: https://ngrok.com/
 
+Start givecookiebot-slack
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+With the tokens saved, start **givecookiebot-slack** in a new terminal with:
+
+.. code-block:: bash
+
+  $ cd givecookiebot-slack  # Go to source code directory (if needed)
+  $ source ./venv/bin/activate  # Activate venv (if applicable)
+  (venv)$ python -m givecookiebotslack.bot
+
+The Flask server is running at ``127.0.0.1:3000``, by default. The bot will be
+waiting for events from slack at the address http://127.0.0.1:3000/slack/events.
+
+Navigating there should render a page that says "These are not the slackbots
+you're looking for."
+
+Once again, use ``ngrok`` to register the bot with Slack Events at
+https://api.slack.com/apps with:
+
+.. code-block:: bash
+
+  ngrok http 3000
+
+Provide the ``https`` forwarding link as the Request URL:
+``https://xxxxxxxx.ngrok.io/slack/events``.
+
+Add the bot to a channel and start passing out 🍪.
+
 License
 -------
 
