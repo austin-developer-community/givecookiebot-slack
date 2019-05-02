@@ -40,6 +40,21 @@ First, the Slack client tokens must be added to the environment variables in
 Next, run ``tokens.py`` to get the ``user`` and ``bot`` tokens that will be
 used to access the Slack API.
 
+.. code-block:: bash
+
+  $ cd givecookiebot-slack  # Go to source code directory (if needed)
+  $ source ./venv/bin/activate  # Activate venv (if applicable)
+  (venv)$ python -m givecookiebotslack.tokens
+
+The Flask server is running at ``127.0.0.1:5000``, by default. Go to
+http://127.0.0.1:5000/begin_auth and click on ``Add to Slack`` to start the
+OAuth process.
+
+Once **givecookiebot-slack** gets approval for the needed scopes and
+permissions, the user and bot tokens should be saved to the
+``SLACK_USER_TOKEN`` and ``SLACK_BOT_TOKEN`` environment variables,
+respectively.
+
 License
 -------
 
