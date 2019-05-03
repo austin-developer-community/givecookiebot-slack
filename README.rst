@@ -62,8 +62,8 @@ One can use `ngrok`_ as a quick way to access the local Flask server externally.
 
 .. note::
 
-	Using ``ngrok`` requires making an account. Free accounts have dynamic domain
-  names that change every 8 hours or when the terminal is closed.
+    Using ``ngrok`` requires making an account. Free accounts have dynamic domain
+    names that change every 8 hours or when the terminal is closed.
 
 Once the local Flask server is running, start ``ngrok`` with:
 
