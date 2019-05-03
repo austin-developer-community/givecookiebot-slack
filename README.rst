@@ -35,7 +35,7 @@ First, the Slack client tokens must be added to the environment variables in
 
   export SLACK_CLIENT_ID="first_long_complicated_string_here"
   export SLACK_CLIENT_SECRET="second_long_complicated_string_here"
-  export SLACK_BOT_SCOPE="channels:history"
+  export SLACK_BOT_SCOPE="channels:history users:read"
 
 Next, run ``tokens.py`` to get the ``user`` and ``bot`` tokens that will be
 used to access the Slack API.
