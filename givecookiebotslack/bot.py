@@ -12,6 +12,7 @@ Attributes:
 """
 
 import os
+import re
 from slackeventsapi import SlackEventAdapter
 from slackclient import SlackClient
 
@@ -26,6 +27,13 @@ slack_client = SlackClient(SLACK_BOT_TOKEN)  # pylint: disable=invalid-name
 @slack_events_adapter.on("message")
 def handle_message(event_data):
     """Example responder to greetings
+# Regular expressions
+usermention_re = re.compile(r'''
+                            <       # open bracket (required)
+                            @       # @ symbol (required)
+                            \w{9}   # 9 alphanumeric characters (required)
+                            >       # close bracket (required)
+''', re.VERBOSE)  # pylint: disable=invalid-name
     """
     message = event_data["event"]
     # If the incoming message contains "hi", then respond with a "Hello" message
