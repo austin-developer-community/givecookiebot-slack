@@ -24,9 +24,6 @@ slack_events_adapter = SlackEventAdapter(SLACK_CLIENT_SECRET, "/slack/events")  
 SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
 slack_client = SlackClient(SLACK_BOT_TOKEN)  # pylint: disable=invalid-name
 
-@slack_events_adapter.on("message")
-def handle_message(event_data):
-    """Example responder to greetings
 # Regular expressions
 usermention_re = re.compile(r'''
                             <       # open bracket (required)
@@ -34,13 +31,26 @@ usermention_re = re.compile(r'''
                             \w{9}   # 9 alphanumeric characters (required)
                             >       # close bracket (required)
 ''', re.VERBOSE)  # pylint: disable=invalid-name
+
+@slack_events_adapter.on("message.channels")
+def handle_message(event_data: dict) -> None:
+    """Channel message handler
+
+    Parses message for cookie emoji (🍪) and a user mention. If mentioned user
+    is in ``user.list``, then change mentioned user's status to include cookie
+    emoji.
+
+    Returns:
+        None.
     """
     message = event_data["event"]
-    # If the incoming message contains "hi", then respond with a "Hello" message
-    if message.get("subtype") is None and "hi" in message.get('text'):
-        channel = message["channel"]
-        message = "Hello <@%s>! :tada:" % message["user"]
-        slack_client.api_call("chat.postMessage", channel=channel, text=message)
+    # If the incoming message contains "🍪" and a user mention.
+    if "🍪" in message.get('text'):
+        # TODO: Confirm mentioned user is in user.list
+        pass
+        # TODO: Change mentioned user's status to include cookie emoji.
+
+        # TODO: Confirm response to status change is ok.
 
 @slack_events_adapter.on("error")
 def error_handler(err):
