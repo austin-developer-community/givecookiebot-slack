@@ -34,17 +34,6 @@ def handle_message(event_data):
         message = "Hello <@%s>! :tada:" % message["user"]
         slack_client.api_call("chat.postMessage", channel=channel, text=message)
 
-
-@slack_events_adapter.on("reaction_added")
-def reaction_added(event_data):
-    """Example reaction emoji echo
-    """
-    event = event_data["event"]
-    emoji = event["reaction"]
-    channel = event["item"]["channel"]
-    text = ":%s:" % emoji
-    slack_client.api_call("chat.postMessage", channel=channel, text=text)
-
 @slack_events_adapter.on("error")
 def error_handler(err):
     """Error events
