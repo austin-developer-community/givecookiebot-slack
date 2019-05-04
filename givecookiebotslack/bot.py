@@ -25,12 +25,12 @@ SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
 slack_client = SlackClient(SLACK_BOT_TOKEN)  # pylint: disable=invalid-name
 
 # Regular expressions
-usermention_re = re.compile(r'''
+USERMENTION_RE = re.compile(r'''
                             <       # open bracket (required)
                             @       # @ symbol (required)
                             \w{9}   # 9 alphanumeric characters (required)
                             >       # close bracket (required)
-''', re.VERBOSE)  # pylint: disable=invalid-name
+                            ''', re.VERBOSE)
 
 @slack_events_adapter.on("message.channels")
 def handle_message(event_data: dict) -> None:
