@@ -33,24 +33,31 @@ USERMENTION_RE = re.compile(r'''
                             ''', re.VERBOSE)
 
 @slack_events_adapter.on("message.channels")
-def handle_message(event_data: dict) -> None:
+def handle_message(event_data: dict):
     """Channel message handler
 
-    Parses message for cookie emoji (🍪) and a user mention. If mentioned user
-    is in ``user.list``, then change mentioned user's status to include cookie
-    emoji.
+    Parses message for cookie emoji (🍪) and a user mention, then changes
+    mentioned user's status to include cookie emoji for 3 hours.
 
     Returns:
-        None.
+        True if successful, otherwise the error code given by the Slack API.
     """
     message = event_data["event"]
+    text = message.get('text')
+    match = USERMENTION_RE.search(text)
     # If the incoming message contains "🍪" and a user mention.
-    if "🍪" in message.get('text'):
-        # TODO: Confirm mentioned user is in user.list
-        pass
-        # TODO: Change mentioned user's status to include cookie emoji.
-
-        # TODO: Confirm response to status change is ok.
+    if all(["🍪" in text, match]):
+        user_id = match.group('user_id')
+        expiration = event_data['event_time'] + (3600 * 3)  # 3 hours from now
+        # Change mentioned user's status to include cookie emoji and expiration time.
+        response = slack_client.api_call("users.profile.set", user=user_id,
+                                         status_text='earned',
+                                         status_emoji=':cookie:',
+                                         status_expiration=expiration)
+        # Confirm response to status change is ok.
+        if not response['ok']:
+            return response['error']
+    return True
 
 @slack_events_adapter.on("error")
 def error_handler(err):
