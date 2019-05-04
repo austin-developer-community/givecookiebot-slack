@@ -7,6 +7,7 @@ Attributes:
     SLACK_BOT_TOKEN (str): Token used to access Slack Web API.
     slack_events_adapter (SlackEventAdapter): Instance of :py:class:`SlackEventAdapter`.
     slack_client (SlackClient): Instance of :py:class:`SlackClient`.
+    USERMENTION_RE (re.compile): Regular expression object matching a user mention pattern.
 
 .. _Event API: https://api.slack.com/events-api
 """
