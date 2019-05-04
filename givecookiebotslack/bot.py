@@ -26,10 +26,10 @@ slack_client = SlackClient(SLACK_BOT_TOKEN)  # pylint: disable=invalid-name
 
 # Regular expressions
 USERMENTION_RE = re.compile(r'''
-                            <       # open bracket (required)
-                            @       # @ symbol (required)
-                            \w{9}   # 9 alphanumeric characters (required)
-                            >       # close bracket (required)
+                            <                    # open bracket (required)
+                            @                    # @ symbol (required)
+                            (?P<user_id>\w{9})   # 9 alphanumeric characters (required)
+                            >                    # close bracket (required)
                             ''', re.VERBOSE)
 
 @slack_events_adapter.on("message.channels")
