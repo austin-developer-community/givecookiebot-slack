@@ -14,8 +14,12 @@ Attributes:
 
 import os
 import re
+import logging
 from slackeventsapi import SlackEventAdapter
 from slackclient import SlackClient
+
+# Logger configuration
+logging.basicConfig(filename='bot.log', filemode='w', level=logging.DEBUG)
 
 # Our app's Slack Event Adapter for receiving actions via the Events API
 SLACK_SIGNING_SECRET = os.environ["SLACK_SIGNING_SECRET"]
@@ -45,12 +49,16 @@ def handle_message(event_data: dict):
         True if successful, otherwise the error code given by the Slack API.
     """
     message = event_data["event"]
+    logging.debug('Event data: %s', message)
     text = message.get('text')
     match = USERMENTION_RE.search(text)
+    logging.debug('Got input text: %s', text)
     # If the incoming message contains "🍪" and a user mention.
     if all([":cookie:" in text, match]):
         user_id = match.group('user_id')
+        logging.info('Found user_id: %s', user_id)
         expiration = float(message.get('ts')) + (3600 * 3)  # 3 hours from now
+        logging.info('Calculated expiration: %s', expiration)
         # Change mentioned user's status to include cookie emoji and expiration time.
         response = slack_client.api_call("users.profile.set", user=user_id,
                                          status_text='earned',
@@ -58,7 +66,9 @@ def handle_message(event_data: dict):
                                          status_expiration=str(expiration))
         # Confirm response to status change is ok.
         if not response['ok']:
-            return response['error']
+            err = response['error']
+            logging.error('handle_message: %s', err)
+            return err
     return True
 
 @slack_events_adapter.on("error")
