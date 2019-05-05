@@ -48,7 +48,7 @@ def handle_message(event_data: dict):
     text = message.get('text')
     match = USERMENTION_RE.search(text)
     # If the incoming message contains "🍪" and a user mention.
-    if all(["🍪" in text, match]):
+    if all([":cookie:" in text, match]):
         user_id = match.group('user_id')
         expiration = event_data['event_time'] + (3600 * 3)  # 3 hours from now
         # Change mentioned user's status to include cookie emoji and expiration time.
