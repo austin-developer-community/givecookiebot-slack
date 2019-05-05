@@ -19,7 +19,8 @@ from slackeventsapi import SlackEventAdapter
 from slackclient import SlackClient
 
 # Logger configuration
-logging.basicConfig(filename='bot.log', filemode='w', level=logging.DEBUG)
+# Change level to logging.DEBUG to debug
+logging.basicConfig(filename='bot.log', filemode='w', level=logging.INFO)
 
 # Our app's Slack Event Adapter for receiving actions via the Events API
 SLACK_SIGNING_SECRET = os.environ["SLACK_SIGNING_SECRET"]
