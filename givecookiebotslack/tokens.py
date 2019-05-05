@@ -55,4 +55,4 @@ def post_install():
     return "Auth complete!"
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
