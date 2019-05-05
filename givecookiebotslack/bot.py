@@ -8,6 +8,7 @@ Attributes:
     slack_events_adapter (SlackEventAdapter): Instance of :py:class:`SlackEventAdapter`.
     slack_client (SlackClient): Instance of :py:class:`SlackClient`.
     USERMENTION_RE (re.compile): Regular expression object matching a user mention pattern.
+    profile (dict): Dictionary containing template of user profile status.
 
 .. _Event API: https://api.slack.com/events-api
 """
@@ -15,6 +16,7 @@ Attributes:
 import os
 import re
 import logging
+import json
 from slackeventsapi import SlackEventAdapter
 from slackclient import SlackClient
 
@@ -39,6 +41,9 @@ USERMENTION_RE = re.compile(r'''
                             >                    # close bracket (required)
                             ''', re.VERBOSE)
 
+# Profile dictionary
+profile = {"profile": {"status_text": "earned", "status_emoji": ":cookie:"}}  # pylint: disable=invalid-name
+
 @slack_events_adapter.on("message")
 def handle_message(event_data: dict):
     """Message handler
@@ -61,16 +66,18 @@ def handle_message(event_data: dict):
         expiration = float(message.get('ts')) + (3600 * 3)  # 3 hours from now
         logging.info('Calculated expiration: %s', expiration)
         # Change mentioned user's status to include cookie emoji and expiration time.
+        profile['profile']['status_expiration'] = int(expiration)
+        logging.debug('Profile payload: %s', json.dumps(profile, indent=4))
         response = slack_client.api_call("users.profile.set", user=user_id,
-                                         status_text='earned',
-                                         status_emoji=':cookie:',
-                                         status_expiration=str(expiration))
+                                         profile=json.dumps(profile, indent=4))
+
         # Confirm response to status change is ok.
         if not response['ok']:
             err = response['error']
             logging.error('handle_message: %s', err)
             logging.debug('Error response: %s', response)
             return err
+        logging.debug('Response: %s', response)
     return True
 
 @slack_events_adapter.on("error")
