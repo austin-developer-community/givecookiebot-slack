@@ -34,9 +34,9 @@ USERMENTION_RE = re.compile(r'''
                             >                    # close bracket (required)
                             ''', re.VERBOSE)
 
-@slack_events_adapter.on("message.channels")
+@slack_events_adapter.on("message")
 def handle_message(event_data: dict):
-    """Channel message handler
+    """Message handler
 
     Parses message for cookie emoji (🍪) and a user mention, then changes
     mentioned user's status to include cookie emoji for 3 hours.
