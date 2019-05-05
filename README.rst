@@ -38,8 +38,8 @@ First, the Slack client tokens must be added to the environment variables in
   export SLACK_SIGNING_SECRET="third_long_complicated_string_here"
   export SLACK_BOT_SCOPE="channels:history users.profile:write"
 
-Next, run ``tokens.py`` to get the ``user`` and ``bot`` tokens that will be
-used to access the Slack API.
+Next, run ``tokens.py`` to get the ``user`` token that will be used to access
+the Slack API.
 
 .. code-block:: bash
 
@@ -52,9 +52,8 @@ http://127.0.0.1:5000/begin_auth and click on ``Add to Slack`` to start the
 OAuth process.
 
 Once **givecookiebot-slack** gets approval for the needed scopes and
-permissions, the user and bot tokens should be saved to the
-``SLACK_USER_TOKEN`` and ``SLACK_BOT_TOKEN`` environment variables,
-respectively.
+permissions, the user token should be saved to the ``SLACK_USER_TOKEN``
+environment variable.
 
 ngrok
 ^^^^^
