@@ -47,6 +47,11 @@ the Slack API.
   $ source ./venv/bin/activate  # Activate venv (if applicable)
   (venv)$ python -m givecookiebotslack.tokens
 
+.. note::
+
+   Only the owner can set the status of an admin user and only owners/admin
+   users can set user statuses.
+
 The Flask server is running at ``127.0.0.1:5000``, by default. Go to
 http://127.0.0.1:5000/begin_auth and click on ``Add to Slack`` to start the
 OAuth process.
@@ -54,6 +59,12 @@ OAuth process.
 Once **givecookiebot-slack** gets approval for the needed scopes and
 permissions, the user token should be saved to the ``SLACK_USER_TOKEN``
 environment variable.
+
+.. warning::
+
+   The SLACK_USER_TOKEN environment variable is lost once the terminal is closed.
+   So, use ``CTRL+C`` to stop Flask and keep the terminal open when starting the
+   bot.
 
 ngrok
 ^^^^^
@@ -73,6 +84,15 @@ Once the local Flask server is running, start ``ngrok`` with:
 
 Use either the ``http`` or ``https`` forwarding address:
 ``xxxxxxxx.ngrok.io/begin_auth``.
+
+In the ``OAuth & Permissions`` settings at https://api.slack.com/apps, make
+sure to set the ``Redirect URL`` to ``xxxxxxxx.ngrok.io/finish_auth``.
+
+If successful, it should render a page that says "Auth complete!".
+
+.. warning::
+
+	As mentioned in the slack
 
 .. _ngrok: https://ngrok.com/
 
@@ -104,6 +124,12 @@ Provide the ``https`` forwarding link as the Request URL:
 ``https://xxxxxxxx.ngrok.io/slack/events``.
 
 Add the bot to a channel and start passing out 🍪.
+
+.. warning::
+
+   This environment is **not** suitable for production. Tokens should be stored
+   a secure database. Ngrok shouldn't be used to create a tunnel. The built-in
+   Flask server should not be used.
 
 License
 -------
