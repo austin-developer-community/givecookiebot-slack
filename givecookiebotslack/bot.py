@@ -4,7 +4,7 @@ Defines `Event API`_ events that the bot will respond to.
 
 Attributes:
     SLACK_SIGNING_SECRET (str): Secret identifying bot to Slack Events API. Like a password.
-    SLACK_BOT_TOKEN (str): Token used to access Slack Web API.
+    SLACK_USER_TOKEN (str): Token used to access Slack Web API.
     slack_events_adapter (SlackEventAdapter): Instance of :py:class:`SlackEventAdapter`.
     slack_client (SlackClient): Instance of :py:class:`SlackClient`.
     USERMENTION_RE (re.compile): Regular expression object matching a user mention pattern.
@@ -22,8 +22,9 @@ SLACK_SIGNING_SECRET = os.environ["SLACK_SIGNING_SECRET"]
 slack_events_adapter = SlackEventAdapter(SLACK_SIGNING_SECRET, "/slack/events")  #pylint: disable=invalid-name
 
 # Create a SlackClient for your bot to use for Web API requests
-SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
-slack_client = SlackClient(SLACK_BOT_TOKEN)  # pylint: disable=invalid-name
+# Admin user token is needed to modify user profiles
+SLACK_USER_TOKEN = os.environ["SLACK_USER_TOKEN"]
+slack_client = SlackClient(SLACK_USER_TOKEN)  # pylint: disable=invalid-name
 
 # Regular expressions
 USERMENTION_RE = re.compile(r'''
