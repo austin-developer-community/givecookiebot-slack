@@ -68,6 +68,7 @@ def handle_message(event_data: dict):
         if not response['ok']:
             err = response['error']
             logging.error('handle_message: %s', err)
+            logging.debug('Error response: %s', response)
             return err
     return True
 
