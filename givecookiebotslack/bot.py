@@ -18,8 +18,8 @@ from slackeventsapi import SlackEventAdapter
 from slackclient import SlackClient
 
 # Our app's Slack Event Adapter for receiving actions via the Events API
-SLACK_CLIENT_SECRET = os.environ["SLACK_CLIENT_SECRET"]
-slack_events_adapter = SlackEventAdapter(SLACK_CLIENT_SECRET, "/slack/events")  #pylint: disable=invalid-name
+SLACK_SIGNING_SECRET = os.environ["SLACK_SIGNING_SECRET"]
+slack_events_adapter = SlackEventAdapter(SLACK_SIGNING_SECRET, "/slack/events")  #pylint: disable=invalid-name
 
 # Create a SlackClient for your bot to use for Web API requests
 SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
