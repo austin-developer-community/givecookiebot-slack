@@ -46,10 +46,9 @@ def post_install():
         code=auth_code
         )
 
-    # Save the bot token to an environmental variable or to your data store
+    # Save the user token to an environmental variable or to your data store
     # for later use
     os.environ["SLACK_USER_TOKEN"] = auth_response['access_token']
-    os.environ["SLACK_BOT_TOKEN"] = auth_response['bot']['bot_access_token']
 
     # Don't forget to let the user know that auth has succeeded!
     return "Auth complete!"
