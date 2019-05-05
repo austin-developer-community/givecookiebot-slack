@@ -50,12 +50,12 @@ def handle_message(event_data: dict):
     # If the incoming message contains "🍪" and a user mention.
     if all([":cookie:" in text, match]):
         user_id = match.group('user_id')
-        expiration = event_data['event_time'] + (3600 * 3)  # 3 hours from now
+        expiration = float(message.get('ts')) + (3600 * 3)  # 3 hours from now
         # Change mentioned user's status to include cookie emoji and expiration time.
         response = slack_client.api_call("users.profile.set", user=user_id,
                                          status_text='earned',
                                          status_emoji=':cookie:',
-                                         status_expiration=expiration)
+                                         status_expiration=str(expiration))
         # Confirm response to status change is ok.
         if not response['ok']:
             return response['error']
