@@ -42,7 +42,7 @@ USERMENTION_RE = re.compile(r'''
 def handle_message(event_data: dict):
     """Message handler
 
-    Parses message for cookie emoji (🍪) and a user mention, then changes
+    Parses message for cookie emoji (:cookie:) and a user mention, then changes
     mentioned user's status to include cookie emoji for 3 hours.
 
     Returns:
@@ -53,7 +53,7 @@ def handle_message(event_data: dict):
     text = message.get('text')
     match = USERMENTION_RE.search(text)
     logging.debug('Got input text: %s', text)
-    # If the incoming message contains "🍪" and a user mention.
+    # If the incoming message contains ":cookie:" and a user mention.
     if all([":cookie:" in text, match]):
         user_id = match.group('user_id')
         logging.info('Found user_id: %s', user_id)
