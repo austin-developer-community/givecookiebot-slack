@@ -1,0 +1,288 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>givecookiebotslack.bot &mdash; givecookiebot-slack 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> givecookiebot-slack
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">givecookiebotslack</a></li>
+</ul>
+<p class="caption"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../about/CONTRIBUTING.html">Contributing Guidelines</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">givecookiebot-slack</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>givecookiebotslack.bot</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for givecookiebotslack.bot</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;givecookiebot-slack</span>
+
+<span class="sd">Defines `Event API`_ events that the bot will respond to.</span>
+
+<span class="sd">Attributes:</span>
+<span class="sd">    SLACK_SIGNING_SECRET (str): Secret identifying bot to Slack Events API. Like a password.</span>
+<span class="sd">    SLACK_USER_TOKEN (str): Token used to access Slack Web API.</span>
+<span class="sd">    slack_events_adapter (SlackEventAdapter): Instance of :py:class:`SlackEventAdapter`.</span>
+<span class="sd">    slack_client (SlackClient): Instance of :py:class:`SlackClient`.</span>
+<span class="sd">    USERMENTION_RE (re.compile): Regular expression object matching a user mention pattern.</span>
+<span class="sd">    profile (dict): Dictionary containing template of user profile status.</span>
+
+<span class="sd">.. _Event API: https://api.slack.com/events-api</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">slackeventsapi</span> <span class="k">import</span> <span class="n">SlackEventAdapter</span>
+<span class="kn">from</span> <span class="nn">slackclient</span> <span class="k">import</span> <span class="n">SlackClient</span>
+
+<span class="c1"># Logger configuration</span>
+<span class="c1"># Change level to logging.DEBUG to debug</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;bot.log&#39;</span><span class="p">,</span> <span class="n">filemode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+<span class="c1"># Our app&#39;s Slack Event Adapter for receiving actions via the Events API</span>
+<span class="n">SLACK_SIGNING_SECRET</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;SLACK_SIGNING_SECRET&quot;</span><span class="p">]</span>
+<span class="n">slack_events_adapter</span> <span class="o">=</span> <span class="n">SlackEventAdapter</span><span class="p">(</span><span class="n">SLACK_SIGNING_SECRET</span><span class="p">,</span> <span class="s2">&quot;/slack/events&quot;</span><span class="p">)</span>  <span class="c1">#pylint: disable=invalid-name</span>
+
+<span class="c1"># Create a SlackClient for your bot to use for Web API requests</span>
+<span class="c1"># Admin user token is needed to modify user profiles</span>
+<span class="n">SLACK_USER_TOKEN</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;SLACK_USER_TOKEN&quot;</span><span class="p">]</span>
+<span class="n">slack_client</span> <span class="o">=</span> <span class="n">SlackClient</span><span class="p">(</span><span class="n">SLACK_USER_TOKEN</span><span class="p">)</span>  <span class="c1"># pylint: disable=invalid-name</span>
+
+<span class="c1"># Regular expressions</span>
+<span class="n">USERMENTION_RE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">                            &lt;                    # open bracket (required)</span>
+<span class="s1">                            @                    # @ symbol (required)</span>
+<span class="s1">                            (?P&lt;user_id&gt;\w</span><span class="si">{9}</span><span class="s1">)   # 9 alphanumeric characters (required)</span>
+<span class="s1">                            &gt;                    # close bracket (required)</span>
+<span class="s1">                            &#39;&#39;&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">VERBOSE</span><span class="p">)</span>
+
+<span class="c1"># Profile dictionary</span>
+<span class="n">profile</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;profile&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;status_text&quot;</span><span class="p">:</span> <span class="s2">&quot;earned&quot;</span><span class="p">,</span> <span class="s2">&quot;status_emoji&quot;</span><span class="p">:</span> <span class="s2">&quot;:cookie:&quot;</span><span class="p">}}</span>  <span class="c1"># pylint: disable=invalid-name</span>
+
+<div class="viewcode-block" id="handle_message"><a class="viewcode-back" href="../../givecookiebotslack.html#givecookiebotslack.bot.handle_message">[docs]</a><span class="nd">@slack_events_adapter</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s2">&quot;message&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">handle_message</span><span class="p">(</span><span class="n">event_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Message handler</span>
+
+<span class="sd">    Parses message for cookie emoji (:cookie:) and a user mention, then changes</span>
+<span class="sd">    mentioned user&#39;s status to include cookie emoji for 3 hours.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        True if successful, otherwise the error code given by the Slack API.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">event_data</span><span class="p">[</span><span class="s2">&quot;event&quot;</span><span class="p">]</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Event data: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;text&#39;</span><span class="p">)</span>
+    <span class="n">match</span> <span class="o">=</span> <span class="n">USERMENTION_RE</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Got input text: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+    <span class="c1"># If the incoming message contains &quot;:cookie:&quot; and a user mention.</span>
+    <span class="k">if</span> <span class="nb">all</span><span class="p">([</span><span class="s2">&quot;:cookie:&quot;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">,</span> <span class="n">match</span><span class="p">]):</span>
+        <span class="n">user_id</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;user_id&#39;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Found user_id: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">user_id</span><span class="p">)</span>
+        <span class="n">expiration</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ts&#39;</span><span class="p">))</span> <span class="o">+</span> <span class="p">(</span><span class="mi">3600</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span>  <span class="c1"># 3 hours from now</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Calculated expiration: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">expiration</span><span class="p">)</span>
+        <span class="c1"># Change mentioned user&#39;s status to include cookie emoji and expiration time.</span>
+        <span class="n">profile</span><span class="p">[</span><span class="s1">&#39;profile&#39;</span><span class="p">][</span><span class="s1">&#39;status_expiration&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">expiration</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Profile payload: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">profile</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">slack_client</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span><span class="s2">&quot;users.profile.set&quot;</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span>
+                                         <span class="n">profile</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">profile</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+
+        <span class="c1"># Confirm response to status change is ok.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">response</span><span class="p">[</span><span class="s1">&#39;ok&#39;</span><span class="p">]:</span>
+            <span class="n">err</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s1">&#39;error&#39;</span><span class="p">]</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;handle_message: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Error response: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">err</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Response: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="error_handler"><a class="viewcode-back" href="../../givecookiebotslack.html#givecookiebotslack.bot.error_handler">[docs]</a><span class="nd">@slack_events_adapter</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">error_handler</span><span class="p">(</span><span class="n">err</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Error events</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">))</span></div>
+
+<span class="c1"># Once we have our event listeners configured, we can start the</span>
+<span class="c1"># Flask server with the default `/events` endpoint on port 3000</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">slack_events_adapter</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">3000</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Austin Developer Community
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

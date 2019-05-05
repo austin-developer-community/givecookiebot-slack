@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>givecookiebotslack.tokens &mdash; givecookiebot-slack 0.2.1 documentation</title>
+  <title>givecookiebotslack.tokens &mdash; givecookiebot-slack 1.0.0 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.2
+                1.0
               </div>
             
           
@@ -200,14 +200,15 @@
         <span class="n">code</span><span class="o">=</span><span class="n">auth_code</span>
         <span class="p">)</span>
 
-    <span class="c1"># Save the bot token to an environmental variable or to your data store</span>
+    <span class="c1"># Save the user token to an environmental variable or to your data store</span>
     <span class="c1"># for later use</span>
-    <span class="c1"># TODO: Add SLACK_SIGNING_SECRET to environment variables? OAuth1 vs 2</span>
     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;SLACK_USER_TOKEN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">auth_response</span><span class="p">[</span><span class="s1">&#39;access_token&#39;</span><span class="p">]</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;SLACK_BOT_TOKEN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">auth_response</span><span class="p">[</span><span class="s1">&#39;bot&#39;</span><span class="p">][</span><span class="s1">&#39;bot_access_token&#39;</span><span class="p">]</span>
 
     <span class="c1"># Don&#39;t forget to let the user know that auth has succeeded!</span>
     <span class="k">return</span> <span class="s2">&quot;Auth complete!&quot;</span></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 </pre></div>
 
            </div>

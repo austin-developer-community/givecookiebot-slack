@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>givecookiebotslack package &mdash; givecookiebot-slack 0.2.1 documentation</title>
+  <title>givecookiebotslack package &mdash; givecookiebot-slack 1.0.0 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.2
+                1.0
               </div>
             
           
@@ -175,6 +175,91 @@
 <span id="givecookiebotslack-bot-module"></span><h2>givecookiebotslack.bot module<a class="headerlink" href="#module-givecookiebotslack.bot" title="Permalink to this headline">¶</a></h2>
 <p>givecookiebot-slack</p>
 <p>Defines <a class="reference external" href="https://api.slack.com/events-api">Event API</a> events that the bot will respond to.</p>
+<dl class="attribute">
+<dt id="givecookiebotslack.bot.SLACK_SIGNING_SECRET">
+<code class="descclassname">givecookiebotslack.bot.</code><code class="descname">SLACK_SIGNING_SECRET</code><a class="headerlink" href="#givecookiebotslack.bot.SLACK_SIGNING_SECRET" title="Permalink to this definition">¶</a></dt>
+<dd><p>Secret identifying bot to Slack Events API. Like a password.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="givecookiebotslack.bot.SLACK_USER_TOKEN">
+<code class="descclassname">givecookiebotslack.bot.</code><code class="descname">SLACK_USER_TOKEN</code><a class="headerlink" href="#givecookiebotslack.bot.SLACK_USER_TOKEN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Token used to access Slack Web API.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="givecookiebotslack.bot.slack_events_adapter">
+<code class="descclassname">givecookiebotslack.bot.</code><code class="descname">slack_events_adapter</code><a class="headerlink" href="#givecookiebotslack.bot.slack_events_adapter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instance of <code class="xref py py-class docutils literal notranslate"><span class="pre">SlackEventAdapter</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>SlackEventAdapter</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="givecookiebotslack.bot.slack_client">
+<code class="descclassname">givecookiebotslack.bot.</code><code class="descname">slack_client</code><a class="headerlink" href="#givecookiebotslack.bot.slack_client" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instance of <code class="xref py py-class docutils literal notranslate"><span class="pre">SlackClient</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>SlackClient</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="givecookiebotslack.bot.USERMENTION_RE">
+<code class="descclassname">givecookiebotslack.bot.</code><code class="descname">USERMENTION_RE</code><a class="headerlink" href="#givecookiebotslack.bot.USERMENTION_RE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Regular expression object matching a user mention pattern.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>re.compile</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="givecookiebotslack.bot.profile">
+<code class="descclassname">givecookiebotslack.bot.</code><code class="descname">profile</code><a class="headerlink" href="#givecookiebotslack.bot.profile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary containing template of user profile status.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="givecookiebotslack.bot.error_handler">
+<code class="descclassname">givecookiebotslack.bot.</code><code class="descname">error_handler</code><span class="sig-paren">(</span><em>err</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/givecookiebotslack/bot.html#error_handler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#givecookiebotslack.bot.error_handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Error events</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="givecookiebotslack.bot.handle_message">
+<code class="descclassname">givecookiebotslack.bot.</code><code class="descname">handle_message</code><span class="sig-paren">(</span><em>event_data: dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/givecookiebotslack/bot.html#handle_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#givecookiebotslack.bot.handle_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Message handler</p>
+<p>Parses message for cookie emoji (:cookie:) and a user mention, then changes
+mentioned user’s status to include cookie emoji for 3 hours.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True if successful, otherwise the error code given by the Slack API.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 <div class="section" id="module-givecookiebotslack.tokens">
 <span id="givecookiebotslack-tokens-module"></span><h2>givecookiebotslack.tokens module<a class="headerlink" href="#module-givecookiebotslack.tokens" title="Permalink to this headline">¶</a></h2>
@@ -196,6 +281,10 @@ Slack’s API.</p>
 </div>
 <div class="section" id="module-givecookiebotslack">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-givecookiebotslack" title="Permalink to this headline">¶</a></h2>
+<p>givecookiebot-slack: Slack bot that adds a cookie emoji (🍪) to a user’s
+status for 3 hours when that user is ‘given’ a cookie in chat.</p>
+<p>GPLv3 License</p>
+<p>Austin Developer Community</p>
 </div>
 </div>
 

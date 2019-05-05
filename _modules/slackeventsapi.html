@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Overview: module code &mdash; givecookiebot-slack 1.0.0 documentation</title>
+  <title>slackeventsapi &mdash; givecookiebot-slack 1.0.0 documentation</title>
   
 
   
@@ -134,7 +134,9 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-      <li>Overview: module code</li>
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>slackeventsapi</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -149,12 +151,31 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>All modules for which code is available</h1>
-<ul><li><a href="givecookiebotslack/bot.html">givecookiebotslack.bot</a></li>
-<li><a href="givecookiebotslack/tokens.html">givecookiebotslack.tokens</a></li>
-<li><a href="slackclient/client.html">slackclient.client</a></li>
-<li><a href="slackeventsapi.html">slackeventsapi</a></li>
-</ul>
+  <h1>Source code for slackeventsapi</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">pyee</span> <span class="k">import</span> <span class="n">EventEmitter</span>
+<span class="kn">from</span> <span class="nn">.server</span> <span class="k">import</span> <span class="n">SlackServer</span>
+
+
+<span class="k">class</span> <span class="nc">SlackEventAdapter</span><span class="p">(</span><span class="n">EventEmitter</span><span class="p">):</span>
+    <span class="c1"># Initialize the Slack event server</span>
+    <span class="c1"># If no endpoint is provided, default to listening on &#39;/slack/events&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signing_secret</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="s2">&quot;/slack/events&quot;</span><span class="p">,</span> <span class="n">server</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">EventEmitter</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">signing_secret</span> <span class="o">=</span> <span class="n">signing_secret</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="o">=</span> <span class="n">SlackServer</span><span class="p">(</span><span class="n">signing_secret</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Start the built in webserver, bound to the host and port you&#39;d like.</span>
+<span class="sd">        Default host is `127.0.0.1` and port 8080.</span>
+
+<span class="sd">        :param host: The host you want to bind the build in webserver to</span>
+<span class="sd">        :param port: The port number you want the webserver to run on</span>
+<span class="sd">        :param debug: Set to `True` to enable debug level logging</span>
+<span class="sd">        :param kwargs: Additional arguments you&#39;d like to pass to Flask</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
 
            </div>
            

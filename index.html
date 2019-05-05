@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>givecookiebot-slack &mdash; givecookiebot-slack 0.2.1 documentation</title>
+  <title>givecookiebot-slack &mdash; givecookiebot-slack 1.0.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.2
+                1.0
               </div>
             
           
@@ -179,11 +179,83 @@ requirements.</p>
 <code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">SLACK_CLIENT_ID</span><span class="o">=</span><span class="s2">&quot;first_long_complicated_string_here&quot;</span>
 <span class="nb">export</span> <span class="nv">SLACK_CLIENT_SECRET</span><span class="o">=</span><span class="s2">&quot;second_long_complicated_string_here&quot;</span>
-<span class="nb">export</span> <span class="nv">SLACK_BOT_SCOPE</span><span class="o">=</span><span class="s2">&quot;third_long_complicated_string_here&quot;</span>
+<span class="nb">export</span> <span class="nv">SLACK_SIGNING_SECRET</span><span class="o">=</span><span class="s2">&quot;third_long_complicated_string_here&quot;</span>
+<span class="nb">export</span> <span class="nv">SLACK_BOT_SCOPE</span><span class="o">=</span><span class="s2">&quot;channels:history users.profile:write&quot;</span>
 </pre></div>
 </div>
-<p>Next, run <code class="docutils literal notranslate"><span class="pre">tokens.py</span></code> to get the <code class="docutils literal notranslate"><span class="pre">user</span></code> and <code class="docutils literal notranslate"><span class="pre">bot</span></code> tokens that will be
-used to access the Slack API.</p>
+<p>Next, run <code class="docutils literal notranslate"><span class="pre">tokens.py</span></code> to get the <code class="docutils literal notranslate"><span class="pre">user</span></code> token that will be used to access
+the Slack API.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> givecookiebot-slack  <span class="c1"># Go to source code directory (if needed)</span>
+$ <span class="nb">source</span> ./venv/bin/activate  <span class="c1"># Activate venv (if applicable)</span>
+<span class="o">(</span>venv<span class="o">)</span>$ python -m givecookiebotslack.tokens
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only the owner can set the status of an admin user and only owners/admin
+users can set user statuses.</p>
+</div>
+<p>The Flask server is running at <code class="docutils literal notranslate"><span class="pre">127.0.0.1:5000</span></code>, by default. Go to
+<a class="reference external" href="http://127.0.0.1:5000/begin_auth">http://127.0.0.1:5000/begin_auth</a> and click on <code class="docutils literal notranslate"><span class="pre">Add</span> <span class="pre">to</span> <span class="pre">Slack</span></code> to start the
+OAuth process.</p>
+<p>Once <strong>givecookiebot-slack</strong> gets approval for the needed scopes and
+permissions, the user token should be saved to the <code class="docutils literal notranslate"><span class="pre">SLACK_USER_TOKEN</span></code>
+environment variable.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The SLACK_USER_TOKEN environment variable is lost once the terminal is closed.
+So, use <code class="docutils literal notranslate"><span class="pre">CTRL+C</span></code> to stop Flask and keep the terminal open when starting the
+bot.</p>
+</div>
+</div>
+<div class="section" id="ngrok">
+<h3>ngrok<a class="headerlink" href="#ngrok" title="Permalink to this headline">¶</a></h3>
+<p>One can use <a class="reference external" href="https://ngrok.com/">ngrok</a> as a quick way to access the local Flask server externally.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Using <code class="docutils literal notranslate"><span class="pre">ngrok</span></code> requires making an account. Free accounts have dynamic domain
+names that change every 8 hours or when the terminal is closed.</p>
+</div>
+<p>Once the local Flask server is running, start <code class="docutils literal notranslate"><span class="pre">ngrok</span></code> with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ngrok http <span class="m">5000</span>
+</pre></div>
+</div>
+<p>Use either the <code class="docutils literal notranslate"><span class="pre">http</span></code> or <code class="docutils literal notranslate"><span class="pre">https</span></code> forwarding address:
+<code class="docutils literal notranslate"><span class="pre">xxxxxxxx.ngrok.io/begin_auth</span></code>.</p>
+<p>In the <code class="docutils literal notranslate"><span class="pre">OAuth</span> <span class="pre">&amp;</span> <span class="pre">Permissions</span></code> settings at <a class="reference external" href="https://api.slack.com/apps">https://api.slack.com/apps</a>, make
+sure to set the <code class="docutils literal notranslate"><span class="pre">Redirect</span> <span class="pre">URL</span></code> to <code class="docutils literal notranslate"><span class="pre">xxxxxxxx.ngrok.io/finish_auth</span></code>.</p>
+<p>If successful, it should render a page that says “Auth complete!”.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>As mentioned in the slack</p>
+</div>
+</div>
+<div class="section" id="start-givecookiebot-slack">
+<h3>Start givecookiebot-slack<a class="headerlink" href="#start-givecookiebot-slack" title="Permalink to this headline">¶</a></h3>
+<p>With the tokens saved, start <strong>givecookiebot-slack</strong> in a new terminal with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> givecookiebot-slack  <span class="c1"># Go to source code directory (if needed)</span>
+$ <span class="nb">source</span> ./venv/bin/activate  <span class="c1"># Activate venv (if applicable)</span>
+<span class="o">(</span>venv<span class="o">)</span>$ python -m givecookiebotslack.bot
+</pre></div>
+</div>
+<p>The Flask server is running at <code class="docutils literal notranslate"><span class="pre">127.0.0.1:3000</span></code>, by default. The bot will be
+waiting for events from slack at the address <a class="reference external" href="http://127.0.0.1:3000/slack/events">http://127.0.0.1:3000/slack/events</a>.</p>
+<p>Navigating there should render a page that says “These are not the slackbots
+you’re looking for.”</p>
+<p>Once again, use <code class="docutils literal notranslate"><span class="pre">ngrok</span></code> to register the bot with Slack Events at
+<a class="reference external" href="https://api.slack.com/apps">https://api.slack.com/apps</a> with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ngrok http <span class="m">3000</span>
+</pre></div>
+</div>
+<p>Provide the <code class="docutils literal notranslate"><span class="pre">https</span></code> forwarding link as the Request URL:
+<code class="docutils literal notranslate"><span class="pre">https://xxxxxxxx.ngrok.io/slack/events</span></code>.</p>
+<p>Add the bot to a channel and start passing out 🍪.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This environment is <strong>not</strong> suitable for production. Tokens should be stored
+a secure database. Ngrok shouldn’t be used to create a tunnel. The built-in
+Flask server should not be used.</p>
+</div>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">API Reference</span></p>
 <ul>

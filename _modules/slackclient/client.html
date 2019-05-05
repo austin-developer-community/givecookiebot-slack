@@ -1,0 +1,491 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>slackclient.client &mdash; givecookiebot-slack 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> givecookiebot-slack
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">givecookiebotslack</a></li>
+</ul>
+<p class="caption"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../about/CONTRIBUTING.html">Contributing Guidelines</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">givecookiebot-slack</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>slackclient.client</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for slackclient.client</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/python</span>
+<span class="c1"># mostly a proxy object to abstract how some of this works</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">.server</span> <span class="k">import</span> <span class="n">Server</span>
+<span class="kn">from</span> <span class="nn">.exceptions</span> <span class="k">import</span> <span class="n">ParseResponseError</span><span class="p">,</span> <span class="n">TokenRefreshError</span>
+
+
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">SlackClient</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The SlackClient makes API Calls to the `Slack Web API &lt;https://api.slack.com/web&gt;`_ as well as</span>
+<span class="sd">    managing connections to the `Real-time Messaging API via websocket &lt;https://api.slack.com/rtm&gt;`_</span>
+
+<span class="sd">    It also manages some of the Client state for Channels that the associated token (User or Bot)</span>
+<span class="sd">    is associated with.</span>
+
+<span class="sd">    For more information, check out the `Slack API Docs &lt;https://api.slack.com/&gt;`_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">token</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">refresh_token</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">token_update_callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">client_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">client_secret</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">proxies</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init:</span>
+<span class="sd">            :Args:</span>
+<span class="sd">                token (str): Your Slack Authentication token. You can find or generate a test token</span>
+<span class="sd">                `here &lt;https://api.slack.com/docs/oauth-test-tokens&gt;`_</span>
+<span class="sd">                Note: Be `careful with your token &lt;https://api.slack.com/docs/oauth-safety&gt;`_</span>
+<span class="sd">                proxies (dict): Proxies to use when create websocket or api calls,</span>
+<span class="sd">                declare http and websocket proxies using {&#39;http&#39;: &#39;http://127.0.0.1&#39;},</span>
+<span class="sd">                and https proxy using {&#39;https&#39;: &#39;https://127.0.0.1:443&#39;}</span>
+<span class="sd">                refresh_token (str): Your Slack app&#39;s refresh token. This token is used to</span>
+<span class="sd">                update your app&#39;s OAuth access token</span>
+<span class="sd">                client_id (str): Your app&#39;s Client ID</span>
+<span class="sd">                client_secret (srt): Your app&#39;s Client Secret (Used for OAuth requests)</span>
+<span class="sd">                refresh_callback (function): Your application&#39;s function for updating Slack</span>
+<span class="sd">                OAuth tokens inside your data store</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">client_id</span> <span class="o">=</span> <span class="n">client_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client_secret</span> <span class="o">=</span> <span class="n">client_secret</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refresh_token</span> <span class="o">=</span> <span class="n">refresh_token</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">token_update_callback</span> <span class="o">=</span> <span class="n">token_update_callback</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">token</span> <span class="o">=</span> <span class="n">token</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">access_token_expires_at</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">if</span> <span class="n">refresh_token</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">token_update_callback</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="o">=</span> <span class="n">Server</span><span class="p">(</span>
+                    <span class="n">connect</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">proxies</span><span class="o">=</span><span class="n">proxies</span><span class="p">,</span>
+                    <span class="n">refresh_token</span><span class="o">=</span><span class="n">refresh_token</span><span class="p">,</span>
+                    <span class="n">client_id</span><span class="o">=</span><span class="n">client_id</span><span class="p">,</span>
+                    <span class="n">client_secret</span><span class="o">=</span><span class="n">client_secret</span><span class="p">,</span>
+                    <span class="n">token_update_callback</span><span class="o">=</span><span class="n">token_update_callback</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">TokenRefreshError</span><span class="p">(</span>
+                    <span class="s2">&quot;Token refresh callback function is required when using refresh token.&quot;</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Slack app configs</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="o">=</span> <span class="n">Server</span><span class="p">(</span><span class="n">token</span><span class="o">=</span><span class="n">token</span><span class="p">,</span> <span class="n">connect</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">proxies</span><span class="o">=</span><span class="n">proxies</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">refresh_access_token</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Refresh the client&#39;s OAUth access tokens</span>
+<span class="sd">        https://api.slack.com/docs/rotating-and-refreshing-credentials</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">post_data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;refresh_token&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">refresh_token</span><span class="p">,</span>
+            <span class="s2">&quot;grant_type&quot;</span><span class="p">:</span> <span class="s2">&quot;refresh_token&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;client_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">client_id</span><span class="p">,</span>
+            <span class="s2">&quot;client_secret&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">client_secret</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">api_requester</span><span class="o">.</span><span class="n">post_http_request</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">refresh_token</span><span class="p">,</span> <span class="n">api_method</span><span class="o">=</span><span class="s2">&quot;oauth.access&quot;</span><span class="p">,</span> <span class="n">post_data</span><span class="o">=</span><span class="n">post_data</span>
+        <span class="p">)</span>
+        <span class="n">response_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+
+        <span class="c1"># If Slack returned an updated access token, update the client, otherwise</span>
+        <span class="c1"># raise TokenRefreshError exception with the error returned from the API</span>
+        <span class="k">if</span> <span class="n">response_json</span><span class="p">[</span><span class="s2">&quot;ok&quot;</span><span class="p">]:</span>
+            <span class="c1"># Update the client&#39;s access token and expiration timestamp</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">team_id</span> <span class="o">=</span> <span class="n">response_json</span><span class="p">[</span><span class="s2">&quot;team_id&quot;</span><span class="p">]</span>
+            <span class="c1"># TODO: Minimize the numer of places token is stored.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">token</span> <span class="o">=</span> <span class="n">response_json</span><span class="p">[</span><span class="s2">&quot;access_token&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">token</span> <span class="o">=</span> <span class="n">response_json</span><span class="p">[</span><span class="s2">&quot;access_token&quot;</span><span class="p">]</span>
+
+            <span class="c1"># Update the token expiration timestamp</span>
+            <span class="n">current_ts</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+            <span class="n">expires_at</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">current_ts</span> <span class="o">+</span> <span class="n">response_json</span><span class="p">[</span><span class="s2">&quot;expires_in&quot;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">access_token_expires_at</span> <span class="o">=</span> <span class="n">expires_at</span>
+            <span class="c1"># Call the developer&#39;s token update callback</span>
+            <span class="n">update_args</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;enterprise_id&quot;</span><span class="p">:</span> <span class="n">response_json</span><span class="p">[</span><span class="s2">&quot;enterprise_id&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;team_id&quot;</span><span class="p">:</span> <span class="n">response_json</span><span class="p">[</span><span class="s2">&quot;team_id&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;access_token&quot;</span><span class="p">:</span> <span class="n">response_json</span><span class="p">[</span><span class="s2">&quot;access_token&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;expires_in&quot;</span><span class="p">:</span> <span class="n">response_json</span><span class="p">[</span><span class="s2">&quot;expires_in&quot;</span><span class="p">],</span>
+            <span class="p">}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">token_update_callback</span><span class="p">(</span><span class="n">update_args</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">TokenRefreshError</span><span class="p">(</span><span class="s2">&quot;Token refresh failed&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">append_user_agent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">append_user_agent</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">rtm_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">with_team_state</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Connects to the RTM Websocket</span>
+
+<span class="sd">        :Args:</span>
+<span class="sd">            with_team_state (bool): Connect via `rtm.start` to pull workspace state information.</span>
+<span class="sd">            `False` connects via `rtm.connect`, which is lighter weight and better for very large</span>
+<span class="sd">            teams.</span>
+
+<span class="sd">        :Returns:</span>
+<span class="sd">            False on exceptions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">refresh_token</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">TokenRefreshError</span><span class="p">(</span>
+                <span class="s2">&quot;Workspace tokens may not be used to connect to the RTM API.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">rtm_connect</span><span class="p">(</span><span class="n">use_rtm_start</span><span class="o">=</span><span class="n">with_team_state</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">connected</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Failed RTM connect&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">api_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Call the Slack Web API as documented here: https://api.slack.com/web</span>
+
+<span class="sd">        :Args:</span>
+<span class="sd">            method (str): The API Method to call. See</span>
+<span class="sd">            `the full list here &lt;https://api.slack.com/methods&gt;`_</span>
+<span class="sd">        :Kwargs:</span>
+<span class="sd">            (optional) kwargs: any arguments passed here will be bundled and sent to the api</span>
+<span class="sd">            requester as post_data and will be passed along to the API.</span>
+
+<span class="sd">            Example::</span>
+
+<span class="sd">                sc.api_call(</span>
+<span class="sd">                    &quot;channels.setPurpose&quot;,</span>
+<span class="sd">                    channel=&quot;CABC12345&quot;,</span>
+<span class="sd">                    purpose=&quot;Writing some code!&quot;</span>
+<span class="sd">                )</span>
+
+<span class="sd">        :Returns:</span>
+<span class="sd">            str -- returns the text of the HTTP response.</span>
+
+<span class="sd">            Examples::</span>
+
+<span class="sd">                u&#39;{&quot;ok&quot;:true,&quot;purpose&quot;:&quot;Testing bots&quot;}&#39;</span>
+<span class="sd">                or</span>
+<span class="sd">                u&#39;{&quot;ok&quot;:false,&quot;error&quot;:&quot;channel_not_found&quot;}&#39;</span>
+
+<span class="sd">            See here for more information on responses: https://api.slack.com/web</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check for missing or expired access token before submitting the request</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">!=</span> <span class="s2">&quot;oauth.access&quot;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">refresh_token</span><span class="p">:</span>
+            <span class="n">current_ts</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+            <span class="n">token_is_expired</span> <span class="o">=</span> <span class="n">current_ts</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">access_token_expires_at</span>
+            <span class="k">if</span> <span class="n">token_is_expired</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">refresh_access_token</span><span class="p">()</span>
+
+        <span class="n">response_body</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Attempt to parse the response as JSON</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response_body</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">json_decode_error</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ParseResponseError</span><span class="p">(</span><span class="n">response_body</span><span class="p">,</span> <span class="n">json_decode_error</span><span class="p">)</span>
+        <span class="n">response_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response_body</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ok&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;im.open&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">attach_channel</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;user&quot;</span><span class="p">],</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;channel&quot;</span><span class="p">][</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">method</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;mpim.open&quot;</span><span class="p">,</span> <span class="s2">&quot;groups.create&quot;</span><span class="p">,</span> <span class="s2">&quot;groups.createchild&quot;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">parse_channel_data</span><span class="p">([</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;group&quot;</span><span class="p">]])</span>
+            <span class="k">elif</span> <span class="n">method</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;channels.create&quot;</span><span class="p">,</span> <span class="s2">&quot;channels.join&quot;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">parse_channel_data</span><span class="p">([</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;channel&quot;</span><span class="p">]])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># if the API request returns an invalid_auth error, refresh the token and try again</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">refresh_token</span>
+                <span class="ow">and</span> <span class="s2">&quot;error&quot;</span> <span class="ow">in</span> <span class="n">response_json</span>
+                <span class="ow">and</span> <span class="n">response_json</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;invalid_auth&quot;</span>
+            <span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">refresh_access_token</span><span class="p">()</span>
+                <span class="c1"># If token refresh was successful, retry the original API request</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span> <span class="nf">rtm_read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reads from the RTM Websocket stream then calls `self.process_changes(item)` for each line</span>
+<span class="sd">        in the returned data.</span>
+
+<span class="sd">        Multiple events may be returned, always returns a list [], which is empty if there are no</span>
+<span class="sd">        incoming messages.</span>
+
+<span class="sd">        :Args:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        :Returns:</span>
+<span class="sd">            data (json) - The server response. For example::</span>
+
+<span class="sd">                [{u&#39;presence&#39;: u&#39;active&#39;, u&#39;type&#39;: u&#39;presence_change&#39;, u&#39;user&#39;: u&#39;UABC1234&#39;}]</span>
+
+<span class="sd">        :Raises:</span>
+<span class="sd">            SlackNotConnected if self.server is not defined.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># in the future, this should handle some events internally i.e. channel</span>
+        <span class="c1"># creation</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">:</span>
+            <span class="n">json_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">websocket_safe_read</span><span class="p">()</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="n">json_data</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">json_data</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
+                    <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">d</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">process_changes</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">data</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SlackNotConnected</span>
+
+    <span class="k">def</span> <span class="nf">rtm_send_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">thread</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reply_broadcast</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sends a message to a given channel.</span>
+
+<span class="sd">        :Args:</span>
+<span class="sd">            channel (str) - the string identifier for a channel or channel name (e.g. &#39;C1234ABC&#39;,</span>
+<span class="sd">            &#39;bot-test&#39; or &#39;#bot-test&#39;)</span>
+<span class="sd">            message (message) - the string you&#39;d like to send to the channel</span>
+<span class="sd">            thread (str or None) - the parent message ID, if sending to a</span>
+<span class="sd">                thread</span>
+<span class="sd">            reply_broadcast (bool) - if messaging a thread, whether to</span>
+<span class="sd">                also send the message back to the channel</span>
+
+<span class="sd">        :Returns:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># The `channel` argument can be a channel name or an ID. At first its assumed to be a</span>
+        <span class="c1"># name and an attempt is made to find the ID in the workspace state cache.</span>
+        <span class="c1"># If that lookup fails, the argument is used as the channel ID.</span>
+        <span class="n">found_channel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">channels</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span>
+        <span class="n">channel_id</span> <span class="o">=</span> <span class="n">found_channel</span><span class="o">.</span><span class="n">id</span> <span class="k">if</span> <span class="n">found_channel</span> <span class="k">else</span> <span class="n">channel</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">rtm_send_message</span><span class="p">(</span>
+            <span class="n">channel_id</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">thread</span><span class="p">,</span> <span class="n">reply_broadcast</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">process_changes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Internal method which processes RTM events and modifies the local data store</span>
+<span class="sd">        accordingly.</span>
+
+<span class="sd">        Stores new channels when joining a group (Multi-party DM), IM (DM) or channel.</span>
+
+<span class="sd">        Stores user data on a team join event.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;type&quot;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;channel_created&quot;</span><span class="p">,</span> <span class="s2">&quot;group_joined&quot;</span><span class="p">):</span>
+                <span class="n">channel</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;channel&quot;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">attach_channel</span><span class="p">(</span><span class="n">channel</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">channel</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span> <span class="p">[])</span>
+            <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;im_created&quot;</span><span class="p">:</span>
+                <span class="n">channel</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;channel&quot;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">attach_channel</span><span class="p">(</span><span class="n">channel</span><span class="p">[</span><span class="s2">&quot;user&quot;</span><span class="p">],</span> <span class="n">channel</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span> <span class="p">[])</span>
+            <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;team_join&quot;</span><span class="p">:</span>
+                <span class="n">user</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;user&quot;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">parse_user_data</span><span class="p">([</span><span class="n">user</span><span class="p">])</span>
+            <span class="k">pass</span>
+
+
+<span class="k">class</span> <span class="nc">SlackNotConnected</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Austin Developer Community
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
