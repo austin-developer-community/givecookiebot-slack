@@ -90,10 +90,6 @@ sure to set the ``Redirect URL`` to ``xxxxxxxx.ngrok.io/finish_auth``.
 
 If successful, it should render a page that says "Auth complete!".
 
-.. warning::
-
-	As mentioned in the slack
-
 .. _ngrok: https://ngrok.com/
 
 Start givecookiebot-slack
@@ -128,8 +124,8 @@ Add the bot to a channel and start passing out 🍪.
 .. warning::
 
    This environment is **not** suitable for production. Tokens should be stored
-   a secure database. Ngrok shouldn't be used to create a tunnel. The built-in
-   Flask server should not be used.
+   in a secure database. Ngrok shouldn't be used to create a tunnel. The
+   built-in Flask server should not be used.
 
 License
 -------
